@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>WebScoket</title>
+	</head>
+	<body>
+			<h1>Chat Room</h1>
+			<input id="sendTxt" type="text" />
+			<button id="sendbtn">发送</button>
+			<script type="text/javascript">
+				//声明一个websocket 字符串是服务器的地址，我们配置为本机的3000端口
+				var websocket=new WebSocket("ws://localhost:3000/");
+				function showMessage(type,data){
+					var div=document.createElement("div");
+					div.innerHTML=type+":"+data;
+					if(type=="enter"){
+						div.style.color="greenyellow";
+					}else if(type=="left"){
+						div.style.color="red";
+					}
+					document.body.appendChild(div);
+				};
+				//当websocket打开的时候
+				websocket.onopen=function(){
+					console.log("websocket open");
+					document.getElementById("sendbtn").onclick=function(){
+						var txt=document.getElementById("sendTxt").value;
+						if(txt){
+							//将信息发送到服务器上面去
+							websocket.send(txt);
+						}
+					}
+				};
+				//当websocket关闭的时候
+				websocket.onclose=function(){
+					console.log("websocket close");
+				};
+				//当websock收到信息的时候
+				websocket.onmessage=function(e){
+					console.log(e.data);
+					console.log(JSON.parse(e.data));
+					var mes=JSON.parse(e.data);
+					showMessage(mes.type,mes.data);
+				};
+				
+			</script>
+	</body>
+</html>
